@@ -7,7 +7,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "NEON Law Firm",
   description: "Professional legal services and consulting",
-,
+
 }
 
 export default function RootLayout({
