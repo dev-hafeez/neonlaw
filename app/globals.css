@@ -119,41 +119,54 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Optimized background - simpler gradient */
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f1f5f9 100%);
+    background-attachment: fixed;
   }
-}
 
-/* Custom brand color overrides */
-.text-brand {
-  color: #0a72bd;
-}
+  /* Enable both horizontal and vertical scrolling */
+  html {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    scroll-behavior: auto;
+  }
 
-.bg-brand {
-  background-color: #0a72bd;
-}
+  body {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    min-width: 100vw;
+    width: max-content;
+  }
 
-.border-brand {
-  border-color: #0a72bd;
-}
+  /* Optimized scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 10px; /* Reduced from 12px */
+    height: 10px;
+  }
 
-.hover\:bg-brand:hover {
-  background-color: #0a72bd;
-}
+  ::-webkit-scrollbar-track {
+    background: rgba(10, 114, 189, 0.05); /* Reduced opacity */
+    border-radius: 5px;
+  }
 
-.hover\:text-brand:hover {
-  color: #0a72bd;
-}
+  ::-webkit-scrollbar-thumb {
+    background: rgba(10, 114, 189, 0.5); /* Reduced opacity */
+    border-radius: 5px;
+    border: 1px solid transparent; /* Reduced border */
+    background-clip: content-box;
+  }
 
-/* Line clamp utilities */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(10, 114, 189, 0.7);
+    background-clip: content-box;
+  }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  ::-webkit-scrollbar-corner {
+    background: rgba(10, 114, 189, 0.05);
+  }
+
+  /* Ensure horizontal scrollbar is always visible */
+  ::-webkit-scrollbar:horizontal {
+    height: 10px;
+  }
 }
