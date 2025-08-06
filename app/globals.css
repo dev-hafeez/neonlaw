@@ -137,11 +137,14 @@
     min-width: 100vw;
     width: max-content;
   }
+/* 
+  html, body, #__next { height: 100%; }
+  body { overflow: hidden; }  */
 
   /* Optimized scrollbar styling */
   ::-webkit-scrollbar {
-    width: 10px; /* Reduced from 12px */
-    height: 10px;
+    width: 0; /* Reduced from 12px */
+    height: 0;
   }
 
   ::-webkit-scrollbar-track {
@@ -167,6 +170,6 @@
 
   /* Ensure horizontal scrollbar is always visible */
   ::-webkit-scrollbar:horizontal {
-    height: 10px;
+    height: 0;
   }
 }
