@@ -1,19 +1,24 @@
 "use client"
 
 import type React from "react"
-
-import { ChevronDown, Search, X } from "lucide-react"
+import { ChevronDown, Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Input } from "@/components/ui/input"
 
 export default function Navbar() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [selectedFilters, setSelectedFilters] = useState<string[]>(["About"]) // Default selected
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(["About"])
   const [searchQuery, setSearchQuery] = useState("")
 
   const filters = [
@@ -38,26 +43,18 @@ export default function Navbar() {
   ]
 
   const handleFilterClick = (filter: string) => {
-    setSelectedFilters((prev) => {
-      if (prev.includes(filter)) {
-        // Remove filter if already selected
-        return prev.filter((f) => f !== filter)
-      } else {
-        // Add filter if not selected
-        return [...prev, filter]
-      }
-    })
+    setSelectedFilters((prev) =>
+      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter],
+    )
   }
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Searching for:", searchQuery, "in filters:", selectedFilters)
-    // Add your search logic here
   }
 
   const handleQuickLinkClick = (link: string) => {
     console.log("Quick link clicked:", link)
-    // Add navigation logic here
   }
 
   return (
@@ -70,21 +67,19 @@ export default function Navbar() {
             Search
           </Button>
         </SheetTrigger>
+
+        {/* NOTE: SheetContent already includes a close (X) button by default. */}
         <SheetContent side="left" className="w-full sm:w-96 p-0">
-          {/* Custom Header */}
+          <SheetTitle>
+            <VisuallyHidden>Search</VisuallyHidden>
+          </SheetTitle>
+
+          {/* Header (no extra X here) */}
           <div className="flex items-center justify-between p-6 border-b">
             <div className="flex items-center gap-3">
               <Search className="h-5 w-5 text-[#0a72bd]" />
               <span className="text-lg font-medium text-gray-900">Search</span>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsSheetOpen(false)}
-              className="h-8 w-8 p-0 hover:bg-gray-100 hover:scale-110 transition-transform duration-200"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
 
           <div className="p-6 space-y-6">
@@ -124,7 +119,9 @@ export default function Navbar() {
             {/* Selected Filters Display */}
             {selectedFilters.length > 0 && (
               <div>
-                <h5 className="text-xs font-medium text-gray-600 mb-2">Selected filters ({selectedFilters.length}):</h5>
+                <h5 className="text-xs font-medium text-gray-600 mb-2">
+                  Selected filters ({selectedFilters.length}):
+                </h5>
                 <div className="flex flex-wrap gap-1">
                   {selectedFilters.map((filter) => (
                     <span
@@ -135,8 +132,10 @@ export default function Navbar() {
                       <button
                         onClick={() => handleFilterClick(filter)}
                         className="hover:scale-110 rounded-full p-0.5 transition-transform duration-200"
+                        aria-label={`Remove ${filter}`}
                       >
-                        <X className="h-3 w-3" />
+                        {/* the default close in SheetContent stays; this is just the tag remove X */}
+                        ×
                       </button>
                     </span>
                   ))}
@@ -161,79 +160,8 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Contact Information */}
-            <div className="border-t pt-6 mt-8">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h4>
-              <div className="space-y-4">
-                <div>
-                  <h5 className="font-medium text-gray-800 mb-1">General Inquiries</h5>
-                  <a
-                    href="mailto:info@neon.law"
-                    className="text-sm text-[#0a72bd] hover:scale-105 inline-block transition-transform duration-200"
-                  >
-                    info@neon.law
-                  </a>
-                  <br />
-                  <a
-                    href="tel:+4930123456789"
-                    className="text-sm text-[#0a72bd] hover:scale-105 inline-block transition-transform duration-200"
-                  >
-                    +49 (0) 30 123 456 789
-                  </a>
-                </div>
-
-                <div>
-                  <h5 className="font-medium text-gray-800 mb-1">Business Development</h5>
-                  <a
-                    href="mailto:business@neon.law"
-                    className="text-sm text-[#0a72bd] hover:scale-105 inline-block transition-transform duration-200"
-                  >
-                    business@neon.law
-                  </a>
-                  <br />
-                  <a
-                    href="tel:+4930123456790"
-                    className="text-sm text-[#0a72bd] hover:scale-105 inline-block transition-transform duration-200"
-                  >
-                    +49 (0) 30 123 456 790
-                  </a>
-                </div>
-
-                <div>
-                  <h5 className="font-medium text-gray-800 mb-1">Career Opportunities</h5>
-                  <a
-                    href="mailto:careers@neon.law"
-                    className="text-sm text-[#0a72bd] hover:scale-105 inline-block transition-transform duration-200"
-                  >
-                    careers@neon.law
-                  </a>
-                  <br />
-                  <a
-                    href="tel:+4930123456791"
-                    className="text-sm text-[#0a72bd] hover:scale-105 inline-block transition-transform duration-200"
-                  >
-                    +49 (0) 30 123 456 791
-                  </a>
-                </div>
-
-                <div>
-                  <h5 className="font-medium text-gray-800 mb-1">Office Address</h5>
-                  <p className="text-sm text-gray-600">
-                    NEON Law Firm
-                    <br />
-                    Unter den Linden 1<br />
-                    10117 Berlin, Germany
-                  </p>
-                </div>
-
-                <div>
-                  <h5 className="font-medium text-gray-800 mb-1">Office Hours</h5>
-                  <p className="text-sm text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM</p>
-                  <p className="text-sm text-gray-600">Saturday: 10:00 AM - 2:00 PM</p>
-                  <p className="text-sm text-gray-600">Sunday: Closed</p>
-                </div>
-              </div>
-            </div>
+            {/* Contact Information — REMOVED */}
+            {/* If you ever want to toggle it, wrap it in: {showContacts && ( ... )} */}
           </div>
         </SheetContent>
       </Sheet>
