@@ -10,7 +10,7 @@ import { useScrollerControls } from "@/lib/pinboard/hooks/useScrollerControls";
 import { useInfinitePlane } from "@/lib/pinboard/hooks/useInfinitePlane";
 import { PLANE_W, PLANE_H, COL_BUFFER, ROW_BUFFER } from "@/lib/pinboard/constants";
 import { useWpTiles } from "@/lib/useWpTiles";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/nav/navbar";
 import HeroTransition from "@/components/HeroTransition";
 import ExitTransition from "@/components/HeroSectionExit";
 

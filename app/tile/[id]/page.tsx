@@ -1,5 +1,5 @@
 import HeroTransition from "@/components/HeroTransition";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/nav/navbar";
 
 export const revalidate = 60;
 

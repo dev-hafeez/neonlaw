@@ -17,7 +17,7 @@ import {
 // ⬇️ swapped: use People tiles (same return shape as your old hook)
 import { usePeopleTiles } from "@/lib/usePeopleTiles";
 
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/nav/navbar";
 import Footer from "@/components/footer";
 import HeroTransition from "@/components/HeroTransition";
 import HeroSectionExit from "@/components/HeroSectionExit";

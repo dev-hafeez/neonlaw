@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Mail, Linkedin, Instagram, X } from "lucide-react";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/nav/navbar";
 import HeroTransition from "@/components/HeroTransition";
 import Footer from "@/components/footer";
 import { useRouter } from "next/navigation";
