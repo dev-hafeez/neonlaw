@@ -54,11 +54,14 @@ export default function PeopleDropdown({
       .finally(() => setLoading(false));
   }, [isOpen, data, loading, slugsOrder, limit]);
 
-  const labelFromSlug = (slug: string) => slug.replace(/-/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
+  const labelFromSlug = (slug: string) =>
+    slug.replace(/-/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
 
   // normalize to always show all slugs, keep order
   const map = new Map<string, { name: string; people: PeopleMenuItem[] }>();
-  (data?.categories ?? []).forEach((c) => map.set(c.slug, { name: c.name || labelFromSlug(c.slug), people: c.people || [] }));
+  (data?.categories ?? []).forEach((c) =>
+    map.set(c.slug, { name: c.name || labelFromSlug(c.slug), people: c.people || [] })
+  );
   const cats = slugsOrder.map((slug) => {
     const e = map.get(slug);
     return {
@@ -99,19 +102,26 @@ export default function PeopleDropdown({
           <DropdownMenuContent
             align="start"
             sideOffset={10}
-            className="p-0 border-none rounded-xl shadow-2xl overflow-visible mt-0"
+            avoidCollisions
+            collisionPadding={12}
+            className="p-0 border-none rounded-xl shadow-2xl overflow-visible mt-0 max-w-[92vw]"
             asChild
             forceMount
           >
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.18 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.18 }}
+            >
               {/* Make this relative so the fly-out positions next to it */}
-              <div className="relative bg-white w-[240px] max-w-[92vw]">
+              <div className="relative bg-white w-[240px] max-w-[92vw] rounded-xl">
                 {loading ? (
                   <div className="p-6 text-sm text-gray-500">Loading…</div>
                 ) : (
                   <>
                     {/* LEFT: categories list */}
-                    <div ref={listRef} className="max-h-[48vh] overflow-y-auto rounded-l-xl">
+                    <div ref={listRef} className="max-h-[70vh] overflow-y-auto rounded-l-xl">
                       <ul className="py-1">
                         {cats.map((c, idx) => {
                           const selected = c.slug === activeSlug;
@@ -123,7 +133,9 @@ export default function PeopleDropdown({
                                   href={`/people?cat=${encodeURIComponent(c.slug)}`}
                                   data-no-transition
                                   onClick={() => onOpenChange(false)}
-                                  className={`truncate text-sm hover:text-black ${selected ? "text-rose-600 font-semibold" : "text-gray-900"}`}
+                                  className={`truncate text-sm hover:text-black ${
+                                    selected ? "text-rose-600 font-semibold" : "text-gray-900"
+                                  }`}
                                 >
                                   {c.name}
                                 </Link>
@@ -132,7 +144,9 @@ export default function PeopleDropdown({
                                 <button
                                   type="button"
                                   aria-label="Show people"
-                                  className={`ml-2 p-1 rounded-md transition-colors ${selected ? "text-rose-600" : "text-gray-400 group-hover:text-gray-600"}`}
+                                  className={`ml-2 p-1 rounded-md transition-colors ${
+                                    selected ? "text-rose-600" : "text-gray-400 group-hover:text-gray-600"
+                                  }`}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     openFlyout(c.slug, idx);
@@ -145,6 +159,18 @@ export default function PeopleDropdown({
                             </li>
                           );
                         })}
+
+                        {/* --- Footer row: Show all --- */}
+                        <li className="mt-1 border-t">
+                          <Link
+                            href="/people"
+                            data-no-transition
+                            onClick={() => onOpenChange(false)}
+                            className="block h-10 px-3 flex items-center text-sm font-semibold text-[#0a72bd] hover:text-[#085a96]"
+                          >
+                            Show all People →
+                          </Link>
+                        </li>
                       </ul>
                     </div>
 

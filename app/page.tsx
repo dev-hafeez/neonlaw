@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import Navbar from "@/components/nav/navbar";
 import HeroTransition from "@/components/HeroTransition";
 import SearchOverlay from "@/components/SearchOverlay";
-import PinterestMasonry from "@/components/pinterest-masonry";
+import PinterestMasonry from "@/components/pinterestMasonry";
 import Footer from '@/components/footer';
 import ExitTransition from '@/components/HeroSectionExit';
 async function getBase() {

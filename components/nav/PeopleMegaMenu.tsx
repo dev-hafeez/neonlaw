@@ -56,7 +56,7 @@ export default function PeopleMegaMenu({
         role="menu"
         aria-label="People mega menu"
         className={[
-          "overflow-visible max-h-none",
+          // "overflow-visible max-h-none",
           "min-w-[960px] grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8",
           "p-6 rounded-xl shadow-xl bg-white",
           className,

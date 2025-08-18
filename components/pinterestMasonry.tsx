@@ -1,19 +1,21 @@
 "use client";
-
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import PinterestCard from "@/components/pinterestCard";
+import { useEffect, useMemo, useRef, useState } from "react";
+import PinterestCard from "./pinterestCard";
 import { useViewport } from "@/lib/pinboard/hooks/useViewport";
 import { useScrollState } from "@/lib/pinboard/hooks/useScrollState";
 import { useScrollerControls } from "@/lib/pinboard/hooks/useScrollerControls";
 import { useInfinitePlane } from "@/lib/pinboard/hooks/useInfinitePlane";
-import { PLANE_W, PLANE_H, COL_BUFFER, ROW_BUFFER } from "@/lib/pinboard/constants";
+import {
+  PLANE_W,
+  PLANE_H,
+  COL_BUFFER,
+  ROW_BUFFER,
+} from "@/lib/pinboard/constants";
 import { useWpTiles } from "@/lib/useWpTiles";
-import Navbar from "@/components/nav/navbar";
-import HeroTransition from "@/components/HeroTransition";
-import ExitTransition from "@/components/HeroSectionExit";
+import HeroTransition from "./HeroTransition";
 
+// Layout constants
 const TILE_W = 270;
 const TILE_H = 220;
 const GAP_X = 25;
@@ -31,49 +33,68 @@ function buildCumY(count: number, step: number) {
   return Array.from({ length: count }, (_, i) => i * step);
 }
 
-export default function About({ q = "", cats = [] }: { q?: string; cats?: (string | number)[] }) {
+export default function PinterestMasonry({
+  q = "",
+  cats = [],
+}: {
+  q?: string;
+  cats?: (string | number)[];
+}) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const { w: vw, h: vh } = useViewport(scrollerRef);
 
-  // Real vs animation columns
+  // REAL columns based on viewport
   const [realCols, setRealCols] = useState(4);
-  const [columns, setColumns] = useState(20); // start dense
-  const [exitingCardId, setExitingCardId] = useState<string | null>(null);
-
   useEffect(() => {
     const w = scrollerRef.current?.clientWidth ?? vw;
     if (!w) return;
-    const maxCols = Math.max(2, Math.min(8, Math.floor((w + GAP_X) / STRIDE_X)));
+    const maxCols = Math.max(
+      2,
+      Math.min(8, Math.floor((w + GAP_X) / STRIDE_X))
+    );
     setRealCols(maxCols);
   }, [vw]);
 
+  // OVERRIDE for animation
+  const [columns, setColumns] = useState(20); // start with dense grid
   useEffect(() => {
     const timer = setTimeout(() => {
-      setColumns(realCols);
+      setColumns(realCols); // transition to real value after 1s
     }, 1000);
     return () => clearTimeout(timer);
   }, [realCols]);
 
   const { targetRef } = useScrollerControls(scrollerRef);
   const scroll = useScrollState(scrollerRef);
-  const { virtualX, virtualY, originX, originY } = useInfinitePlane(scrollerRef, vw, vh, scroll, targetRef);
+  const { virtualX, virtualY, originX, originY } = useInfinitePlane(
+    scrollerRef,
+    vw,
+    vh,
+    scroll,
+    targetRef
+  );
 
   const { tiles, hasMore, setSize, isLoading } = useWpTiles(q, cats);
   const tilesStableRef = useRef<typeof tiles>([]);
   if (tiles.length) tilesStableRef.current = tiles;
   const pattern = tiles.length ? tiles : tilesStableRef.current;
 
-  const colBuckets = useMemo(() => bucketize(pattern, columns), [pattern, columns]);
+  const colBuckets = useMemo(
+    () => bucketize(pattern, columns),
+    [pattern, columns]
+  );
+
   const rowStep = TILE_H + GAP_Y;
-  const cumYPerCol = useMemo(() => colBuckets.map((col) => buildCumY(col.length, rowStep)), [colBuckets, rowStep]);
+  const cumYPerCol = useMemo(
+    () => colBuckets.map((col) => buildCumY(col.length, rowStep)),
+    [colBuckets, rowStep]
+  );
   const patternHPerCol = useMemo(
     () => colBuckets.map((col) => Math.max(rowStep, col.length * rowStep)),
     [colBuckets, rowStep]
   );
-
   const columnOffsets = useMemo(() => {
     const unit = Math.round(TILE_H / 3);
     return Array.from({ length: columns }, (_, k) => (k % 3) * unit);
@@ -93,29 +114,24 @@ export default function About({ q = "", cats = [] }: { q?: string; cats?: (strin
     }
   }, [virtualY, hasMore, isLoading, setSize]);
 
-  const handleNavigate = (id: string) => {
-    setExitingCardId(id);
-    setTimeout(() => {
-      router.push(`/tile/${id}`);
-    }, 1000);
-  };
-
-  // Delay scaling until after HeroTransition
+  // ✅ Delay animation until after HeroTransition
   const [startGridAnim, setStartGridAnim] = useState(false);
   useEffect(() => {
+    // Assuming HeroTransition lasts 1.2s
     const t = setTimeout(() => setStartGridAnim(true), 1200);
     return () => clearTimeout(t);
   }, []);
 
   return (
-    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20">
-      <HeroTransition />
-      <Navbar />
+    <div ref={scrollerRef} className="fixed inset-0 overflow-auto z-20">
 
       <motion.div
         ref={planeRef}
         className="relative"
-        style={{ width: PLANE_W, height: PLANE_H }}
+        style={{
+          width: PLANE_W,
+          height: PLANE_H,
+        }}
         initial={{ scale: 0.6 }}
         animate={{ scale: startGridAnim ? 1 : 0.4 }}
         transition={{ duration: 2, ease: "easeInOut" }}
@@ -129,9 +145,11 @@ export default function About({ q = "", cats = [] }: { q?: string; cats?: (strin
           const cumY = cumYPerCol[baseCol] ?? [];
           const patternH = patternHPerCol[baseCol] || rowStep;
           const yOffset = columnOffsets[baseCol] || 0;
+
           const shiftedVirtualY = virtualY - yOffset;
           const firstRepeat = Math.floor(shiftedVirtualY / patternH) - ROW_BUFFER;
-          const repeatCount = Math.ceil(vh / patternH) + ROW_BUFFER * 2;
+          const repeatCount =
+            Math.ceil(vh / patternH) + ROW_BUFFER * 2;
 
           return (
             <motion.div
@@ -144,9 +162,10 @@ export default function About({ q = "", cats = [] }: { q?: string; cats?: (strin
               {Array.from({ length: repeatCount }).flatMap((__, ry) => {
                 const rep = firstRepeat + ry;
                 const yBase = rep * patternH;
-
                 return colCards.map((card: any, idx: number) => {
-                  const y = Math.round(yBase + yOffset + cumY[idx] - originY.current);
+                  const y = Math.round(
+                    yBase + yOffset + cumY[idx] - originY.current
+                  );
                   return (
                     <motion.div
                       key={`tile-${colIndex}-${rep}-${card.id}-${idx}`}
@@ -161,11 +180,7 @@ export default function About({ q = "", cats = [] }: { q?: string; cats?: (strin
                       layout
                       transition={{ duration: 1 }}
                     >
-                      <PinterestCard
-                        {...card}
-                        isExiting={exitingCardId === card.id}
-                        onClick={() => handleNavigate(card.id)}
-                      />
+                      <PinterestCard {...card} />
                     </motion.div>
                   );
                 });
@@ -174,8 +189,6 @@ export default function About({ q = "", cats = [] }: { q?: string; cats?: (strin
           );
         })}
       </motion.div>
-
-      <ExitTransition />
     </div>
   );
 }
