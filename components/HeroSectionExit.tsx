@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { flushSync } from 'react-dom'
 
 type Phase = 'idle' | 'bg' | 'blue' | 'white'
 
@@ -68,7 +69,7 @@ export default function ExitTransition() {
     isAnimating.current = true
     document.documentElement.classList.add('overflow-hidden')
 
-    setPhase('bg')                          // 1) sweep bg
+    flushSync(() => setPhase('bg'))         // 1) sweep bg
     schedule(() => setPhase('blue'), DURATION.blueDelay * 1000)
     schedule(() => setPhase('white'), DURATION.swapDelay * 1000)
     schedule(() => router.push(url), DURATION.total * 1000)
@@ -120,16 +121,14 @@ export default function ExitTransition() {
     <>
       {/* Gradient Background */}
       <AnimatePresence>
-        {phase !== 'idle' && (
-          <motion.div
-            key="bg"
-            className="fixed inset-0 z-[9998] bg-gradient-to-r from-[#0a72bd] via-[#38bdf8] to-[#bae6fd] pointer-events-none"
-            initial={{ x: '100%', filter: 'blur(16px)' }}
-            animate={{ x: 0, filter: 'blur(0px)' }}
-            exit={{ x: '-100%', filter: 'blur(16px)' }}
-            transition={{ duration: DURATION.bgIn, ease: [0.4, 0, 0.2, 1] }}
-          />
-        )}
+        <motion.div
+          key="bg"
+          className="fixed inset-0 z-[9998] bg-gradient-to-r from-[#0a72bd] via-[#38bdf8] to-[#bae6fd] pointer-events-none"
+          initial={{ x: '100%', filter: 'blur(16px)' }}
+          animate={{ x: 0, filter: 'blur(0px)' }}
+          exit={{ x: '-100%', filter: 'blur(16px)' }}
+          transition={{ duration: DURATION.bgIn, ease: [0.4, 0, 0.2, 1] }}
+        />
       </AnimatePresence>
 
       {/* Blue Logo */}
