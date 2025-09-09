@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import PinterestCard from "@/components/cards/PinterestCard";
 import { useViewport } from "@/lib/pinboard/hooks/useViewport";
@@ -33,11 +33,15 @@ function buildCumY(count: number, step: number) {
   return Array.from({ length: count }, (_, i) => i * step);
 }
 
-export default function Career({}: { q?: string; cats?: (string | number)[] }) {
-    const searchParams = useSearchParams();
-    const category = getCategory(searchParams);
-    const cats = category ? [category] : [];
-    const q = searchParams?.get("q") || "";
+export default function Career({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const category = getCategory(searchParams);
+  const cats = category ? [category] : [];
+  const q = typeof searchParams.q === "string" ? searchParams.q : "";
+
   const scrollerRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -65,27 +69,46 @@ export default function Career({}: { q?: string; cats?: (string | number)[] }) {
 
   const { targetRef } = useScrollerControls(scrollerRef);
   const scroll = useScrollState(scrollerRef);
-  const { virtualX, virtualY, originX, originY } = useInfinitePlane(scrollerRef, vw, vh, scroll, targetRef);
+  const { virtualX, virtualY, originX, originY } = useInfinitePlane(
+    scrollerRef,
+    vw,
+    vh,
+    scroll,
+    targetRef
+  );
 
   // Use jobs data when category is "Jobs", otherwise use regular posts
-  const isJobsCategory = cats.includes('Jobs') || cats.includes('jobs');
-  
-  const { tiles: postTiles, hasMore: postHasMore, setSize: postSetSize, isLoading: postIsLoading } = useWpTiles(q, isJobsCategory ? '' : cats.join(','));
-  const { tiles: jobTiles, hasMore: jobHasMore, setSize: jobSetSize, isLoading: jobIsLoading } = useWpJobs(q, '');
-  
+  const isJobsCategory = cats.includes("Jobs") || cats.includes("jobs");
+
+  const {
+    tiles: postTiles,
+    hasMore: postHasMore,
+    setSize: postSetSize,
+    isLoading: postIsLoading,
+  } = useWpTiles(q, isJobsCategory ? "" : cats.join(","));
+  const {
+    tiles: jobTiles,
+    hasMore: jobHasMore,
+    setSize: jobSetSize,
+    isLoading: jobIsLoading,
+  } = useWpJobs(q, "");
+
   // Use jobs data when Jobs category is selected
   const tiles = isJobsCategory ? jobTiles : postTiles;
   const hasMore = isJobsCategory ? jobHasMore : postHasMore;
   const setSize = isJobsCategory ? jobSetSize : postSetSize;
   const isLoading = isJobsCategory ? jobIsLoading : postIsLoading;
-  
+
   const tilesStableRef = useRef<typeof tiles>([]);
   if (tiles.length) tilesStableRef.current = tiles;
   const pattern = tiles.length ? tiles : tilesStableRef.current;
 
   const colBuckets = useMemo(() => bucketize(pattern, columns), [pattern, columns]);
   const rowStep = TILE_H + GAP_Y;
-  const cumYPerCol = useMemo(() => colBuckets.map((col) => buildCumY(col.length, rowStep)), [colBuckets, rowStep]);
+  const cumYPerCol = useMemo(
+    () => colBuckets.map((col) => buildCumY(col.length, rowStep)),
+    [colBuckets, rowStep]
+  );
   const patternHPerCol = useMemo(
     () => colBuckets.map((col) => Math.max(rowStep, col.length * rowStep)),
     [colBuckets, rowStep]
@@ -113,7 +136,6 @@ export default function Career({}: { q?: string; cats?: (string | number)[] }) {
   const handleNavigate = (id: string) => {
     setExitingCardId(id);
     setTimeout(() => {
-      // Navigate to Jobs route for job tiles, otherwise to tile route
       const route = isJobsCategory ? `/Jobs/${id}` : `/tile/${id}`;
       router.push(route);
     }, 1000);
@@ -127,11 +149,18 @@ export default function Career({}: { q?: string; cats?: (string | number)[] }) {
   }, []);
 
   return (
-    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20">
+    <div
+      ref={scrollerRef}
+      className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20"
+    >
       <HeroTransition />
       <Navbar />
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 bg-white">
-        <img src="/Blue.png" alt="NEON Background Logo" className="w-96 h-96 object-contain" />
+        <img
+          src="/Blue.png"
+          alt="NEON Background Logo"
+          className="w-96 h-96 object-contain"
+        />
       </div>
 
       <motion.div
@@ -168,7 +197,9 @@ export default function Career({}: { q?: string; cats?: (string | number)[] }) {
                 const yBase = rep * patternH;
 
                 return colCards.map((card: any, idx: number) => {
-                  const y = Math.round(yBase + yOffset + cumY[idx] - originY.current);
+                  const y = Math.round(
+                    yBase + yOffset + cumY[idx] - originY.current
+                  );
                   return (
                     <motion.div
                       key={`tile-${colIndex}-${rep}-${card.id}-${idx}`}
