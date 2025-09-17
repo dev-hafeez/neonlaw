@@ -10,12 +10,13 @@ import { useScrollerControls } from "@/lib/pinboard/hooks/useScrollerControls";
 import { useInfinitePlane } from "@/lib/pinboard/hooks/useInfinitePlane";
 import { PLANE_W, PLANE_H, COL_BUFFER, ROW_BUFFER } from "@/lib/pinboard/constants";
 import { useWpTiles } from "@/lib/hooks/useWpTiles";
+import { useWpJobs } from "@/lib/hooks/useWpJobs";
 import Navbar from "@/components/nav/Navbar";
 import HeroTransition from "@/components/layout/HeroTransition";
 import ExitTransition from "@/components/layout/HeroSectionExit";
 import { getCategory } from "@/utils/getCategory";
 
-const TILE_W = 220;
+const TILE_W = 270;
 const TILE_H = 220;
 const GAP_X = 25;
 const GAP_Y = 25;
@@ -32,10 +33,11 @@ function buildCumY(count: number, step: number) {
   return Array.from({ length: count }, (_, i) => i * step);
 }
 
-export default function NewsClient() {
+export default function Career() {
   const searchParams = useSearchParams();
-  const cats = getCategory(searchParams);
-  const q = getCategory(searchParams);
+  const category = getCategory(searchParams);
+  const cats = category ? [category] : [];
+  const q = searchParams?.get("q") || "";
 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
@@ -44,7 +46,7 @@ export default function NewsClient() {
   const { w: vw, h: vh } = useViewport(scrollerRef);
 
   const [realCols, setRealCols] = useState(4);
-  const [columns, setColumns] = useState(20);
+  const [columns, setColumns] = useState(20); // start dense
   const [exitingCardId, setExitingCardId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,18 +65,50 @@ export default function NewsClient() {
 
   const { targetRef } = useScrollerControls(scrollerRef);
   const scroll = useScrollState(scrollerRef);
-  const { virtualX, virtualY, originX, originY } = useInfinitePlane(scrollerRef, vw, vh, scroll, targetRef);
+  const { virtualX, virtualY, originX, originY } = useInfinitePlane(
+    scrollerRef,
+    vw,
+    vh,
+    scroll,
+    targetRef
+  );
 
-  const { tiles, hasMore, setSize, isLoading } = useWpTiles(q, cats);
+  const isJobsCategory = cats.includes("Jobs") || cats.includes("jobs");
+
+  const {
+    tiles: postTiles,
+    hasMore: postHasMore,
+    setSize: postSetSize,
+    isLoading: postIsLoading,
+  } = useWpTiles(q, isJobsCategory ? "" : cats.join(","));
+  const {
+    tiles: jobTiles,
+    hasMore: jobHasMore,
+    setSize: jobSetSize,
+    isLoading: jobIsLoading,
+  } = useWpJobs(q, "");
+
+  const tiles = isJobsCategory ? jobTiles : postTiles;
+  const hasMore = isJobsCategory ? jobHasMore : postHasMore;
+  const setSize = isJobsCategory ? jobSetSize : postSetSize;
+  const isLoading = isJobsCategory ? jobIsLoading : postIsLoading;
+
   const tilesStableRef = useRef<typeof tiles>([]);
   if (tiles.length) tilesStableRef.current = tiles;
   const pattern = tiles.length ? tiles : tilesStableRef.current;
 
-  const colBuckets = useMemo(() => bucketize(pattern, columns), [pattern, columns]);
+  const colBuckets = useMemo(
+    () => bucketize(pattern, columns),
+    [pattern, columns]
+  );
   const rowStep = TILE_H + GAP_Y;
-  const cumYPerCol = useMemo(() => colBuckets.map((col) => buildCumY(col.length, rowStep)), [colBuckets, rowStep]);
+  const cumYPerCol = useMemo(
+    () => colBuckets.map((col) => buildCumY(col.length, rowStep)),
+    [colBuckets, rowStep]
+  );
   const patternHPerCol = useMemo(
-    () => colBuckets.map((col) => Math.max(rowStep, col.length * rowStep)),
+    () =>
+      colBuckets.map((col) => Math.max(rowStep, col.length * rowStep)),
     [colBuckets, rowStep]
   );
 
@@ -100,7 +134,8 @@ export default function NewsClient() {
   const handleNavigate = (id: string) => {
     setExitingCardId(id);
     setTimeout(() => {
-      router.push(`/tile/${id}`);
+      const route = isJobsCategory ? `/Jobs/${id}` : `/tile/${id}`;
+      router.push(route);
     }, 1000);
   };
 
@@ -111,12 +146,18 @@ export default function NewsClient() {
   }, []);
 
   return (
-    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20">
+    <div
+      ref={scrollerRef}
+      className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20"
+    >
       <HeroTransition />
       <Navbar />
-
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 bg-white">
-        <img src="/Blue.png" alt="NEON Background Logo" className="w-150 h-150 object-contain" />
+        <img
+          src="/Blue.png"
+          alt="NEON Background Logo"
+          className="w-96 h-96 object-contain"
+        />
       </div>
 
       <motion.div
@@ -138,7 +179,8 @@ export default function NewsClient() {
           const yOffset = columnOffsets[baseCol] || 0;
           const shiftedVirtualY = virtualY - yOffset;
           const firstRepeat = Math.floor(shiftedVirtualY / patternH) - ROW_BUFFER;
-          const repeatCount = Math.ceil(vh / patternH) + ROW_BUFFER * 2;
+          const repeatCount =
+            Math.ceil(vh / patternH) + ROW_BUFFER * 2;
 
           return (
             <motion.div
@@ -153,7 +195,9 @@ export default function NewsClient() {
                 const yBase = rep * patternH;
 
                 return colCards.map((card: any, idx: number) => {
-                  const y = Math.round(yBase + yOffset + cumY[idx] - originY.current);
+                  const y = Math.round(
+                    yBase + yOffset + cumY[idx] - originY.current
+                  );
                   return (
                     <motion.div
                       key={`tile-${colIndex}-${rep}-${card.id}-${idx}`}

@@ -15,7 +15,7 @@ import HeroTransition from "@/components/layout/HeroTransition";
 import ExitTransition from "@/components/layout/HeroSectionExit";
 import { getCategory } from "@/utils/getCategory";
 
-const TILE_W = 220;
+const TILE_W = 270;
 const TILE_H = 220;
 const GAP_X = 25;
 const GAP_Y = 25;
@@ -32,7 +32,7 @@ function buildCumY(count: number, step: number) {
   return Array.from({ length: count }, (_, i) => i * step);
 }
 
-export default function NewsClient() {
+export default function ExpertiseClient() {
   const searchParams = useSearchParams();
   const cats = getCategory(searchParams);
   const q = getCategory(searchParams);
@@ -111,13 +111,12 @@ export default function NewsClient() {
   }, []);
 
   return (
-    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20">
+    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20 bg-white">
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 bg-white">
+        <img src="/Blue.png" alt="NEON Background Logo" className="w-96 h-96 object-contain" />
+      </div>
       <HeroTransition />
       <Navbar />
-
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 bg-white">
-        <img src="/Blue.png" alt="NEON Background Logo" className="w-150 h-150 object-contain" />
-      </div>
 
       <motion.div
         ref={planeRef}
