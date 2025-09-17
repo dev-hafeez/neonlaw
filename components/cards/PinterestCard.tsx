@@ -86,18 +86,24 @@ const PinterestCard = memo(function PinterestCard({
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
-      
+      {/* Button in top-right */}
+      {hasButton && (
+        <div className="absolute top-4 right-4 z-10">
+          <Button className="bg-[#0a72bd] hover:bg-[#085a96] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+            {buttonText}
+          </Button>
+        </div>
+      )}
+
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
         {subtitle && <div className="text-sm opacity-90 mb-1">{subtitle}</div>}
         <div className="text-md mb-3">{title}</div>
         {description && (
-          <div className="text-lg font-semibold mb-1">{title}</div>
-        )}
-
-        {hasButton && (
-          <Button className="bg-[#0a72bd] hover:bg-[#085a96] text-white px-4 py-2 rounded-full text-sm font-semibold">
-            {buttonText}
-          </Button>
+          <div className="text-lg font-semibold mb-1">
+            {description.length > 100
+              ? description.slice(0, 20) + "..."
+              : description}
+          </div>
         )}
       </div>
     </div>
