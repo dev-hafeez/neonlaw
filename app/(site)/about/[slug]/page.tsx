@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import BeliefCard from "@/components/cards/BeliefCard";
 import BeliefCarousel from "@/components/cards/BeliefCarousel";
+import ScrollToTopButton from "@/components/ui/ScrollToTopButton";
+import ScrollIcon from "@/components/ui/ScrollIcon";
+import PageFooter from "@/components/layout/PageFooter";
 import { wpFetch } from "@/lib/api/fetcher";
 
 export const revalidate = 60;
@@ -66,9 +69,7 @@ export default async function BeliefPage({ params }: { params: Promise<{ slug: s
   const moreData = await wpFetch(MORE_QUERY, { first: 8 });
   const more = (moreData?.data?.beliefs?.nodes ?? []).filter((n: any) => n.slug !== slug);
 
-  const heroTitle =
-    belief.beliefFields?.heroTitle ||
-    `${belief.beliefFields?.teaserPrefix ?? "We believe in"} ${belief.beliefFields?.teaserTitle ?? belief.title}`;
+  const heroTitle = belief.beliefFields?.heroTitle || belief.beliefFields?.teaserTitle || belief.title;
 
   return (
     <main className="min-h-screen bg-white">
@@ -85,20 +86,26 @@ export default async function BeliefPage({ params }: { params: Promise<{ slug: s
           </div>
         )}
         
-        <div className="relative h-full flex items-center">
-          <div className="mx-auto max-w-7xl px-6 w-full">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
+        <div className="relative h-full flex items-end">
+          <div className="w-full pb-20 pl-12">
+            <div className="flex flex-col max-w-2xl">
+              <span className="text-white/90 text-4xl md:text-4xl font-medium tracking-wide uppercase">
+                We believe in
+              </span>
+              <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white leading-tight">
                 {heroTitle}
               </h1>
             </div>
           </div>
         </div>
+        
+        {/* Scroll Down Mouse Icon */}
+        <ScrollIcon />
       </section>
 
       {/* Breadcrumb */}
       <section className="py-6 bg-gray-50 border-b">
-        <div className="mx-auto max-w-7xl px-6">
+        <div className="w-full px-12">
           <nav className="text-sm text-gray-600">
             <Link href="/" className="hover:text-blue-600 transition-colors">
               Home
@@ -115,14 +122,14 @@ export default async function BeliefPage({ params }: { params: Promise<{ slug: s
 
       {/* Content Section */}
       <section className="py-20 bg-white">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="w-full px-12">
           <div className="grid gap-12 md:grid-cols-2 items-start">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 leading-tight">
                 At NEON, we see each case as a blank canvas, a setting to create perfectly fitting solutions for our clients.
               </h2>
             </div>
-            <div className="space-y-6 text-lg leading-relaxed text-gray-700">
+            <div className="text-lg leading-relaxed text-gray-700">
               {belief.beliefFields?.introLeft && (
                 <p>{belief.beliefFields.introLeft}</p>
               )}
@@ -145,20 +152,19 @@ export default async function BeliefPage({ params }: { params: Promise<{ slug: s
       {more.length > 0 && (
         <>
           <BeliefCarousel beliefs={more} />
-          <section className="py-8 bg-gray-50">
-            <div className="mx-auto max-w-7xl px-6">
-              <div className="text-center">
-                <Link 
-                  href="/about" 
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Back to About
-                </Link>
-              </div>
-            </div>
-          </section>
         </>
       )}
+      
+      {/* Scroll to Top Section */}
+      <section className="py-6 bg-white">
+        <div className="w-full px-12">
+          <div className="flex justify-end">
+            <ScrollToTopButton />
+          </div>
+        </div>
+      </section>
+      
+      <PageFooter />
     </main>
   );
 }

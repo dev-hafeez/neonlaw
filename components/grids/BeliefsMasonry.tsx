@@ -15,7 +15,7 @@ import {
 import { useWpBeliefs } from "@/lib/hooks/useWpBeliefs";
 
 // Layout constants
-const TILE_W = 270;
+const TILE_W = 220;
 const TILE_H = 220;
 const GAP_X = 25;
 const GAP_Y = 25;
@@ -133,8 +133,8 @@ export default function BeliefsMasonry({
     [colBuckets, rowStep]
   );
   const columnOffsets = useMemo(() => {
-    const unit = Math.round(TILE_H / 3);
-    return Array.from({ length: layoutColumns }, (_, k) => (k % 3) * unit);
+    const unit = Math.round(TILE_H / 4);
+    return Array.from({ length: layoutColumns }, (_, k) => (k % 4) * unit);
   }, [layoutColumns]);
 
   // Calculate optimal spacing based on number of cards

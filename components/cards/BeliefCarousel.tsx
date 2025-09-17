@@ -34,13 +34,13 @@ export default function BeliefCarousel({ beliefs }: BeliefCarouselProps) {
 
   return (
     <section className="py-16 bg-white">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="w-full px-12">
         <h2 className="text-2xl font-bold text-[#0a72bd] mb-12 text-center">More Beliefs</h2>
         
         <div className="relative">
           {/* Navigation Arrows */}
           <button 
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="absolute left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
             onClick={scrollLeft}
             aria-label="Scroll left"
           >
@@ -50,7 +50,7 @@ export default function BeliefCarousel({ beliefs }: BeliefCarouselProps) {
           </button>
           
           <button 
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="absolute right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
             onClick={scrollRight}
             aria-label="Scroll right"
           >
@@ -62,7 +62,7 @@ export default function BeliefCarousel({ beliefs }: BeliefCarouselProps) {
           {/* Scrollable Container */}
           <div 
             id="beliefs-scroll"
-            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 px-16"
+            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 px-0"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {beliefs.map((b: any) => (
@@ -93,16 +93,10 @@ export default function BeliefCarousel({ beliefs }: BeliefCarouselProps) {
                     </p>
                   )}
                   <h3 className="text-xl font-bold leading-tight mb-4">
-                    {b.beliefFields?.teaserTitle || b.title}
+                    {b.beliefFields?.teaserTitle || b.beliefFields?.teaserTitle || b.title}
                   </h3>
                 </div>
                 
-                {/* Learn More Badge */}
-                <div className="absolute top-4 right-4">
-                  <span className="bg-[#0a72bd] text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                    LEARN MORE
-                  </span>
-                </div>
               </a>
             ))}
           </div>

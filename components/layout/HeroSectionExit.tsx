@@ -147,7 +147,7 @@ export default function ExitTransition() {
               alt="Blue Logo"
               width={384}
               height={384}
-              className="drop-shadow-xl w-96 h-96 object-contain"
+              className="drop-shadow-xl w-150 h-150 object-contain"
               priority
             />
           </motion.div>
@@ -170,7 +170,7 @@ export default function ExitTransition() {
               alt="White Logo"
               width={384}
               height={384}
-              className="drop-shadow-xl w-96 h-96 object-contain"
+              className="drop-shadow-xl w-150 h-150 object-contain"
               priority
             />
           </motion.div>

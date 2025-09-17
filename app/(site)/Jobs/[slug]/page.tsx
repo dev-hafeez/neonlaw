@@ -55,6 +55,7 @@ const MORE_JOBS_QUERY = /* GraphQL */ `
   }
 `;
 
+
 function stripHtml(s?: string | null) {
   return (s || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
@@ -111,6 +112,27 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
     <main className="min-h-screen bg-white">
       {/* HERO */}
       <section className="relative h-screen bg-gradient-to-br from-orange-200 via-pink-200 to-orange-300 overflow-hidden">
+        {/* X Button at top right */}
+        <button
+
+          className="absolute top-6 right-6 z-10 bg-black/20 hover:bg-black/40 text-white p-3 rounded-xl bg-blue-400 transition-all duration-300 backdrop-blur-sm"
+          aria-label="Close"
+        >
+          <svg 
+            className="w-6 h-6" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M6 18L18 6M6 6l12 12" 
+            />
+          </svg>
+        </button>
+        
         {job.featuredImage?.node?.sourceUrl && (
           <div className="absolute inset-0">
             <img
@@ -122,23 +144,25 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
           </div>
         )}
         
-        <div className="relative h-full flex items-center">
+        <div className="relative h-full flex items-end">
           <div className="mx-auto max-w-7xl px-6 w-full">
-            <div className="text-center">
+            <div className="text-start">
               {f.tileLabel && (
-                <p className="text-white/90 text-lg md:text-xl mb-4 font-medium tracking-wide">
+                <p className="text-white text-lg md:text-xl mb-4 font-medium tracking-wide">
                   {f.tileLabel}
                 </p>
               )}
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
                 {heroTitle}
+                <button className="bg-blue-400 rounded-2xl w-30 text-lg ml-100 h-10 text-white " > Apply Now </button>
               </h1>
+              
               {f.ctaUrl && (
                 <a
                   href={f.ctaUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center px-8 py-4 bg-pink-600 text-white text-lg font-semibold rounded-xl hover:bg-pink-700 transition-colors shadow-lg"
+                  className="inline-flex items-center px-8 py-4 bg-blue-400 text-white text-lg font-semibold rounded-xl hover:bg-pink-700 transition-colors shadow-lg"
                 >
                   {ctaLabel}
                 </a>
@@ -183,11 +207,11 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
               {/* Mission */}
               {(f.mission || "").trim() && (
                 <div>
-                  <h2 className="text-2xl font-bold text-pink-600 mb-6">Your mission</h2>
+                  <h2 className="text-2xl font-bold text-blue-400 mb-6">Your mission</h2>
                   <div className="space-y-3">
                     {bullets(f.mission).map((item, i) => (
                       <div key={i} className="flex items-start">
-                        <span className="text-pink-600 mr-3 mt-1 flex-shrink-0">-</span>
+                        <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">-</span>
                         <span className="text-gray-700 leading-relaxed">{item}</span>
                       </div>
                     ))}
@@ -198,11 +222,11 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
               {/* Profile */}
               {(f.profile || "").trim() && (
                 <div>
-                  <h2 className="text-2xl font-bold text-pink-600 mb-6">Your profile</h2>
+                  <h2 className="text-2xl font-bold text-blue-400 mb-6">Your profile</h2>
                   <div className="space-y-3">
                     {bullets(f.profile).map((item, i) => (
                       <div key={i} className="flex items-start">
-                        <span className="text-pink-600 mr-3 mt-1 flex-shrink-0">+</span>
+                        <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">+</span>
                         <span className="text-gray-700 leading-relaxed">{item}</span>
                       </div>
                     ))}
@@ -216,11 +240,11 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
               {/* Offer */}
               {(f.offer || "").trim() && (
                 <div>
-                  <h2 className="text-2xl font-bold text-pink-600 mb-6">What we offer</h2>
+                  <h2 className="text-2xl font-bold text-blue-400 mb-6">What we offer</h2>
                   <div className="space-y-3">
                     {bullets(f.offer).map((item, i) => (
                       <div key={i} className="flex items-start">
-                        <span className="text-pink-600 mr-3 mt-1 flex-shrink-0">+</span>
+                        <span className="text-blue-400 mr-3 mt-1 flex-shrink-0">+</span>
                         <span className="text-gray-700 leading-relaxed">{item}</span>
                       </div>
                     ))}
@@ -230,8 +254,8 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
 
               {/* Signing bonus */}
               {(f.signingBonus || "").trim() && (
-                <div className="bg-pink-50 rounded-xl p-6 border border-pink-200">
-                  <h2 className="text-xl font-bold text-pink-600 mb-4">Signing Bonus</h2>
+                <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                  <h2 className="text-xl font-bold text-blue-400 mb-4">Signing Bonus</h2>
                   <p className="text-gray-700 leading-relaxed">{f.signingBonus}</p>
                 </div>
               )}
@@ -255,10 +279,10 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-pink-100 to-orange-100 flex items-center justify-center">
+                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-orange-100 flex items-center justify-center">
                       <div className="text-center">
                         <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                          <span className="text-pink-600 text-2xl font-bold">
+                          <span className="text-blue-400 text-2xl font-bold">
                             {(person?.title || fallback?.name || 'C').split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                           </span>
                         </div>
@@ -270,7 +294,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
 
                 {/* Right: Contact Info */}
                 <div className="p-8 md:p-12">
-                  <h3 className="text-2xl font-bold text-pink-600 mb-6">Any questions?</h3>
+                  <h3 className="text-2xl font-bold text-blue-400 mb-6">Any questions?</h3>
 
                   {person ? (
                     <>
@@ -299,7 +323,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                           {person.peopleFields?.email && (
                             <a 
                               href={`mailto:${person.peopleFields.email}`}
-                              className="inline-flex items-center gap-2 bg-pink-500 text-white border border-pink-500 rounded-full px-4 py-2 text-sm font-medium hover:bg-pink-600 transition-colors"
+                              className="inline-flex items-center gap-2 bg-blue-400 text-white border border-blue-400 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
                             >
                               ✉️ Email
                             </a>
@@ -307,7 +331,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                           {fallback?.phone && (
                             <a 
                               href={`tel:${fallback.phone}`}
-                              className="inline-flex items-center gap-2 bg-pink-500 text-white border border-pink-500 rounded-full px-4 py-2 text-sm font-medium hover:bg-pink-600 transition-colors"
+                              className="inline-flex items-center gap-2 bg-blue-400 text-white border border-blue-400 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
                             >
                               📞 Call
                             </a>
@@ -334,7 +358,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                         {fallback?.email && (
                           <a 
                             href={`mailto:${fallback.email}`}
-                            className="inline-flex items-center gap-2 bg-pink-500 text-white border border-pink-500 rounded-full px-4 py-2 text-sm font-medium hover:bg-pink-600 transition-colors"
+                            className="inline-flex items-center gap-2 bg-blue-400 text-white border border-blue-400 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
                           >
                             ✉️ Email
                           </a>
@@ -342,7 +366,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                         {fallback?.phone && (
                           <a 
                             href={`tel:${fallback.phone}`}
-                            className="inline-flex items-center gap-2 bg-pink-500 text-white border border-pink-500 rounded-full px-4 py-2 text-sm font-medium hover:bg-pink-600 transition-colors"
+                            className="inline-flex items-center gap-2 bg-blue-400 text-white border border-blue-400 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
                           >
                             📞 Call
                           </a>
@@ -372,6 +396,28 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
 
       {/* ALL VACANCIES CAROUSEL */}
       <JobCarousel jobs={moreJobs} />
+      
+      {/* To the Top Button */}
+      <button
+        
+        className="fixed bottom-6 right-6 bg-[#0a72bd] hover:bg-[#085a96] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50"
+        aria-label="Scroll to top"
+      >
+        <svg 
+          className="w-6 h-6" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M5 10l7-7m0 0l7 7m-7-7v18" 
+          />
+        </svg>
+      </button>
     </main>
   );
 }

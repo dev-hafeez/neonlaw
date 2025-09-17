@@ -14,10 +14,11 @@ import Navbar from "@/components/nav/Navbar";
 import HeroTransition from "@/components/layout/HeroTransition";
 import ExitTransition from "@/components/layout/HeroSectionExit";
 
-const TILE_W = 270;
+const TILE_W = 220;
 const TILE_H = 220;
 const GAP_X = 25;
-const GAP_Y = 25;
+const GAP_Y = 2;
+
 const COLUMN_WIDTH = TILE_W;
 const STRIDE_X = COLUMN_WIDTH + GAP_X;
 
@@ -108,7 +109,7 @@ export default function About({ q = "Jobs", cats = ["Jobs"] }: { q?: string; cat
   }, []);
 
   return (
-    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20">
+    <div ref={scrollerRef} className="fixed inset-0 overflow-y-auto overflow-x-hidden z-20 text-justify">
       <HeroTransition />
       <Navbar />
 

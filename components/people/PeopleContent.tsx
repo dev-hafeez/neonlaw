@@ -21,7 +21,7 @@ import Footer from "@/components/layout/Footer";
 import HeroTransition from "@/components/layout/HeroTransition";
 import HeroSectionExit from "@/components/layout/HeroSectionExit";
 
-const TILE_W = 270;
+const TILE_W = 220;
 const TILE_H = 220;
 const GAP_X = 25;
 const GAP_Y = 25;

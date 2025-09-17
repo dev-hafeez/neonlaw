@@ -17,7 +17,7 @@ import { useSearch } from "@/components/context/SearchContext";
 // import HeroTransition from "./HeroTransition";
 
 // Layout constants
-const TILE_W = 270;
+const TILE_W = 220;
 const TILE_H = 220;
 const GAP_X = 25;
 const GAP_Y = 25;

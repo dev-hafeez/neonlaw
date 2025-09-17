@@ -19,7 +19,8 @@ export default function RootLayout({
     <html lang="en">
       <body
         style={{
-          fontFamily: GeistSans.style.fontFamily,
+          
+          fontFamily: "var(--font-mono), var(--font-sans), -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji",
           backgroundColor: "#fff",
           ["--font-sans" as any]: GeistSans.variable,
           ["--font-mono" as any]: GeistMono.variable,

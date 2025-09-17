@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { memo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import { Title } from "@radix-ui/react-toast";
 
 interface PinterestCardProps {
   id: string;
@@ -88,7 +89,7 @@ const PinterestCard = memo(function PinterestCard({
       
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
         {subtitle && <div className="text-sm opacity-90 mb-1">{subtitle}</div>}
-        <div className="text-md mb-3">{badge}</div>
+        <div className="text-md mb-3">{title}</div>
         {description && (
           <div className="text-lg font-semibold mb-1">{title}</div>
         )}

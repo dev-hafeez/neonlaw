@@ -140,7 +140,7 @@ export default function Navbar() {
           </Link>
         </div>
         <Link href="/Career?category=Jobs"
-          className={`bg-[#0a72bd] flex flex-col items-center justify-center text-white rounded-xl w-[140px] px-4 py-2 shadow-md border border-gray-200 hover:scale-105 transition-transform h-14 hover:bg-[#084a7a] opacity-100`}
+          className={`bg-[#0a72bd] flex flex-col items-center justify-center text-white rounded-sm w-[140px] px-4 py-2 shadow-md border-0 border-gray-200 hover:scale-105 transition-transform h-14 hover:bg-[#084a7a] ${showApplyNowOnly ? 'opacity-100' : 'opacity-100'}`}
           onClick={() => setShowApplyNowOnly(!showApplyNowOnly)}
         >
           APPLY NOW
