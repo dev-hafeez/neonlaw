@@ -34,8 +34,8 @@ export default function JobCarousel({ jobs }: JobCarouselProps) {
 
   return (
     <section className="py-16 bg-white">
-      <div className="mx-auto max-w-7xl px-6">
-        <h2 className="text-2xl font-bold text-[#0a72bd] mb-12 text-center">All Vacancies</h2>
+      <div className="mx-auto mr-8 px-6 ml-8">
+        <h2 className="text-2xl font-bold text-[#0a72bd] mb-12 text-center">More Jobs</h2>
         
         <div className="relative">
           {/* Navigation Arrows */}
@@ -69,7 +69,7 @@ export default function JobCarousel({ jobs }: JobCarouselProps) {
               <a 
                 key={j.slug} 
                 href={`/Jobs/${j.slug}`} 
-                className="group relative block rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 h-64"
+                className="group relative block overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 h-84"
               >
                 {/* Background Image or Gradient */}
                 {j.featuredImage?.node?.sourceUrl ? (
@@ -99,7 +99,7 @@ export default function JobCarousel({ jobs }: JobCarouselProps) {
                 
                 {/* Apply Now Badge */}
                 <div className="absolute top-4 right-4">
-                  <span className="bg-[#0a72bd] text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                  <span className="bg-[#0a72bd] text-white text-xs font-bold px-3 py-3 rounded-xl">
                     APPLY NOW
                   </span>
                 </div>

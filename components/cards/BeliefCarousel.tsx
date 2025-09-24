@@ -69,7 +69,7 @@ export default function BeliefCarousel({ beliefs }: BeliefCarouselProps) {
               <a 
                 key={b.slug} 
                 href={`/about/${b.slug}`} 
-                className="group relative block rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 h-64"
+                className="group relative block  overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 h-78"
               >
                 {/* Background Image or Gradient */}
                 {b.featuredImage?.node?.sourceUrl ? (

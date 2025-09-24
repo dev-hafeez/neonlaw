@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import PinterestCard from "../cards/PinterestCard";
+import Footer from "../layout/Footer";
 
 type Person = {
   title: string;
@@ -50,6 +51,9 @@ export default function PersonProfile({ person }: { person: Person }) {
   const pf = person.peopleFields || {};
   const categories = person.categories?.nodes || [];
   const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [showFooter, setShowFooter] = useState(false);
+  const [showEmailContainer, setShowEmailContainer] = useState(false);
+  const [showLinkedInContainer, setShowLinkedInContainer] = useState(false);
 
   const qualifications = linesToList(pf.qualifications);
   const work = linesToList(pf.work);
@@ -70,6 +74,30 @@ export default function PersonProfile({ person }: { person: Person }) {
   const team = teamData?.nodes || [];
   const allContent = allData?.nodes || [];
 
+  // Scroll detection for footer visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // Show footer when user is near the bottom (within 100px of the end)
+      const threshold = 100;
+      const isNearBottom = scrollTop + windowHeight >= documentHeight - threshold;
+      
+      setShowFooter(isNearBottom);
+    };
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Check initial position
+    handleScroll();
+
+    // Cleanup
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <main className="min-h-screen bg-white">
       {/* HERO SECTION */}
@@ -88,20 +116,76 @@ export default function PersonProfile({ person }: { person: Person }) {
   )}
   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
+  {/* X Close Button */}
+  <button
+    onClick={() => window.history.back()}
+    className="absolute top-6 right-6 z-50 bg-blue-400 backdrop-blue-400 text-white p-3 rounded-xl transition-all duration-300 hover:scale-110 shadow-lg"
+    aria-label="Close"
+  >
+    <svg 
+      className="w-6 h-6" 
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+      strokeWidth={2.5}
+    >
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        d="M6 18L18 6M6 6l12 12" 
+      />
+    </svg>
+  </button>
+
   {/* Top-right buttons */}
   <div className="fixed top-6 left-6 z-20 flex flex-wrap items-center gap-3">
     <div className="flex items-center gap-3">
   {pf.email && (
-    <a 
-      href={`mailto:${pf.email}`}
-      className="flex items-center ml-10 justify-center w-14 h-14 bg-white text-[#0a72bd] border border-4 border-[#0a72bd] rounded-xl hover:bg-[#0a72bd] transition-colors hover:text-white"
+    <div 
+      className="relative group ml-10"
+      onMouseEnter={() => setShowEmailContainer(true)}
+      onMouseLeave={() => setShowEmailContainer(false)}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 " fill="currentColor" viewBox="0 0 24 24">
-        <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 
-                 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 
-                 4-8 5-8-5V6l8 5 8-5v2z" />
-      </svg>
-    </a>
+      <a 
+        href={`mailto:${pf.email}`}
+        className="flex items-center justify-center w-14 h-14 bg-white text-[#0a72bd] border border-4 border-[#0a72bd] rounded-xl hover:bg-[#0a72bd] transition-all duration-300 hover:text-white hover:scale-110"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 
+                   2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 
+                   4-8 5-8-5V6l8 5 8-5v2z" />
+        </svg>
+      </a>
+      
+      {/* Sliding Email Container */}
+      <div className={`absolute left-full top-0 ml-2 bg-white border border-[#0a72bd] rounded-xl shadow-lg transition-all duration-300 ease-in-out transform ${
+        showEmailContainer 
+          ? 'translate-x-0 opacity-100 scale-100' 
+          : '-translate-x-4 opacity-0 scale-95 pointer-events-none'
+      }`}>
+        <div className="p-4 min-w-[200px]">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-semibold text-[#0a72bd]">Contact</h4>
+          </div>
+          <div className="space-y-2">
+            <a 
+              href={`mailto:${pf.email}`}
+              className="block w-full text-left px-3 py-2 bg-[#0a72bd] text-white rounded-lg hover:bg-[#085a96] transition-colors text-sm"
+            >
+              📧 {pf.email}
+            </a>
+            {pf.assistant?.email && (
+              <a 
+                href={`mailto:${pf.assistant.email}`}
+                className="block w-full text-left px-3 py-2 bg-gray-100 text-[#0a72bd] rounded-lg hover:bg-gray-200 transition-colors text-sm"
+              >
+                👤 {pf.assistant.email}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   )}
 
   {/*pf.phone && (
@@ -123,41 +207,82 @@ export default function PersonProfile({ person }: { person: Person }) {
   
 
   {pf.linkedin && (
-    <a 
-      href={pf.linkedin} 
-      target="_blank" 
-      rel="noreferrer"
-      className="flex items-center text-3xl font-black justify-center w-14 h-14 bg-white text-[#0a72bd] border border-[#0a72bd] border-4 rounded-xl hover:bg-[#0a72bd] transition-colors hover:text-white"
+    <div 
+      className={`relative group transition-all duration-300 ease-in-out ${
+        showEmailContainer ? 'translate-x-[220px]' : 'translate-x-0'
+      }`}
+      onMouseEnter={() => setShowLinkedInContainer(true)}
+      onMouseLeave={() => setShowLinkedInContainer(false)}
     >
-      in
-    </a>
+      <a 
+        href={pf.linkedin} 
+        target="_blank" 
+        rel="noreferrer"
+        className="flex items-center text-4xl font-black justify-center w-14 h-14 bg-white text-[#0a72bd] border border-[#0a72bd] border-4 rounded-xl hover:bg-[#0a72bd] transition-all duration-300 hover:text-white hover:scale-110"
+      >
+        in
+      </a>
+      
+      {/* Sliding LinkedIn Container */}
+      <div className={`absolute left-full top-0 ml-2 bg-white border border-[#0a72bd] rounded-xl shadow-lg transition-all duration-300 ease-in-out transform ${
+        showLinkedInContainer 
+          ? 'translate-x-0 opacity-100 scale-100' 
+          : '-translate-x-4 opacity-0 scale-95 pointer-events-none'
+      }`}>
+        <div className="p-4 min-w-[200px]">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-semibold text-[#0a72bd]">LinkedIn</h4>
+          </div>
+          <div className="space-y-2">
+            <a 
+              href={pf.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="block w-full text-left px-3 py-2 bg-[#0a72bd] text-white rounded-lg hover:bg-[#085a96] transition-colors text-sm"
+            >
+              🔗 {pf.linkedin}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   )}
 
  {pf.spotify && (
-  <a 
-    href={pf.spotify} 
-    target="_blank" 
-    rel="noreferrer"
-    className="flex items-center justify-center w-50 h-12 bg-white text-black shadow-md rounded-xl hover:text-white hover:bg-black transition-colors"
-  ><div className="mr-5 font-bold">What i listen to</div>
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-green-500 left-5" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 0C5.372 0 0 5.373 0 12c0 
-               6.627 5.372 12 12 12s12-5.373 
-               12-12c0-6.627-5.372-12-12-12zm5.485 
-               17.451a.747.747 0 01-1.03.272c-2.83-1.732-6.395-2.125-10.598-1.166a.75.75 
-               0 01-.33-1.463c4.574-1.032 
-               8.57-.57 11.757 1.354.36.22.475.692.201 
-               1.003zm1.471-3.294a.934.934 0 
-               01-1.282.34c-3.233-1.986-8.158-2.564-11.956-1.404a.937.937 
-               0 01-1.155-.62.936.936 0 
-               01.62-1.155c4.396-1.34 
-               9.865-.696 13.617 1.597a.936.936 
-               0 01.156 1.242zm.123-3.42c-3.857-2.294-10.23-2.505-13.896-1.373a1.124 
-               1.124 0 01-.662-2.146c4.255-1.314 
-               11.362-1.07 15.74 1.572a1.125 1.125 
-               0 01-1.182 1.947z"/>
-    </svg>
-  </a>
+  <div className={`relative group transition-all duration-300 ease-in-out ${
+    showEmailContainer || showLinkedInContainer ? 'translate-x-[220px]' : 'translate-x-0'
+  }`}>
+    <a 
+      href={pf.spotify} 
+      target="_blank" 
+      rel="noreferrer"
+      className="flex items-center justify-center w-50 h-12 bg-white text-black shadow-md rounded-xl hover:text-white hover:bg-black transition-all duration-300 hover:translate-x-1"
+    >
+      <div className="mr-5 font-bold">What i listen to</div>
+      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-green-500 left-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 0C5.372 0 0 5.373 0 12c0 
+                 6.627 5.372 12 12 12s12-5.373 
+                 12-12c0-6.627-5.372-12-12-12zm5.485 
+                 17.451a.747.747 0 01-1.03.272c-2.83-1.732-6.395-2.125-10.598-1.166a.75.75 
+                 0 01-.33-1.463c4.574-1.032 
+                 8.57-.57 11.757 1.354.36.22.475.692.201 
+                 1.003zm1.471-3.294a.934.934 0 
+                 01-1.282.34c-3.233-1.986-8.158-2.564-11.956-1.404a.937.937 
+                 0 01-1.155-.62.936.936 0 
+                 01.62-1.155c4.396-1.34 
+                 9.865-.696 13.617 1.597a.936.936 
+                 0 01.156 1.242zm.123-3.42c-3.857-2.294-10.23-2.505-13.896-1.373a1.124 
+                 1.124 0 01-.662-2.146c4.255-1.314 
+                 11.362-1.07 15.74 1.572a1.125 1.125 
+                 0 01-1.182 1.947z"/>
+      </svg>
+    </a>
+    {/* Spotify Tooltip */}
+    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10">
+      {pf.spotify}
+      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-800"></div>
+    </div>
+  </div>
 )}
 
 </div>
@@ -173,7 +298,7 @@ export default function PersonProfile({ person }: { person: Person }) {
   <div className="absolute bottom-0 left-0 p-6 md:p-12">
     <div className="max-w-6xl mx-auto">
       {pf.position && (
-        <p className="text-white/90 text-lg md:text-2xl uppercase tracking-wider font-semibold mb-4">
+        <p className="text-white/90 text-lg md:text-2xl uppercase tracking-wider font-semibold mb-0">
   {pf.position}
 </p>
 
@@ -188,8 +313,8 @@ export default function PersonProfile({ person }: { person: Person }) {
 
       {/* HEADLINE QUOTE */}
       {pf.headline && (
-        <section className="py-0 md:py-20 bg-white">
-  <div className="px-6">
+        <section className="py-8 bg-white">
+  <div className="">
     <h2 className="w-full text-2xl md:text-4xl lg:text-5xl font-black  text-gray-900 leading-relaxed text-left">
       "{pf.headline}"
     </h2>
@@ -202,10 +327,10 @@ export default function PersonProfile({ person }: { person: Person }) {
   <div className="w-full px-6">
     {/* Main Content - Two Column Layout */}
     {(pf.introLeft || pf.introRight || person.content) && (
-      <div className="grid gap-12 md:grid-cols-2 mb-12 w-full">
-        <div className="space-y-6">
+      <div className="grid gap-12 md:grid-cols-2 mb-12 w-ful text-justifyl">
+        <div className="">
           {pf.introLeft && (
-            <div className="text-xl leading-relaxed ">
+            <div className="text-lg leading-relaxed  text-justify">
               {pf.introLeft}
             </div>
           )}
@@ -218,7 +343,7 @@ export default function PersonProfile({ person }: { person: Person }) {
         </div>
         <div className="space-y-6">
           {pf.introRight && (
-            <div className="text-xl leading-relaxed ">
+            <div className="text-lg leading-relaxed  text-justify">
               {pf.introRight}
             </div>
           )}
@@ -312,33 +437,47 @@ export default function PersonProfile({ person }: { person: Person }) {
       )}
       <div className="space-y-3 flex gap-2">
         {pf.assistant?.email && (
-  <a 
-    className="flex items-center justify-center w-12 h-12 bg-white text-[#0a72bd] border border-[#0a72bd] rounded-xl hover:bg-[#085a96] transition-colors hover:text-white"
-    href={`mailto:${pf.assistant.email}`}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 
-               2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 
-               4-8 5-8-5V6l8 5 8-5v2z" />
-    </svg>
-  </a>
-)}
+          <div className="relative group">
+            <a 
+              className="flex items-center justify-center w-12 h-12 bg-white text-[#0a72bd] border border-[#0a72bd] rounded-xl hover:bg-[#085a96] transition-all duration-300 hover:text-white hover:scale-110"
+              href={`mailto:${pf.assistant.email}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 
+                         2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 
+                         4-8 5-8-5V6l8 5 8-5v2z" />
+              </svg>
+            </a>
+            {/* Assistant Email Tooltip */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10">
+              {pf.assistant.email}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-800"></div>
+            </div>
+          </div>
+        )}
 
-{pf.assistant?.phone && (
-  <a 
-    className="flex items-center justify-center w-12 h-12 bg-white text-[#0a72bd] border border-[#0a72bd] rounded-xl hover:bg-[#085a96] transition-colors hover:text-white ml-2"
-    href={`tel:${pf.assistant.phone}`}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 
-               1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 
-               1 1v3.5c0 .55-.45 1-1 1C10.85 21 3 13.15 3 
-               4.5 3 3.95 3.45 3.5 4 3.5H7.5c.55 0 1 .45 
-               1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 
-               1.02l-2.2 2.2z"/>
-    </svg>
-  </a>
-)}
+        {pf.assistant?.phone && (
+          <div className="relative group">
+            <a 
+              className="flex items-center justify-center w-12 h-12 bg-white text-[#0a72bd] border border-[#0a72bd] rounded-xl hover:bg-[#085a96] transition-all duration-300 hover:text-white hover:translate-x-1 ml-2"
+              href={`tel:${pf.assistant.phone}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 
+                         1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 
+                         1 1v3.5c0 .55-.45 1-1 1C10.85 21 3 13.15 3 
+                         4.5 3 3.95 3.45 3.5 4 3.5H7.5c.55 0 1 .45 
+                         1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 
+                         1.02l-2.2 2.2z"/>
+              </svg>
+            </a>
+            {/* Assistant Phone Tooltip */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10">
+              {pf.assistant.phone}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-800"></div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
@@ -372,32 +511,39 @@ export default function PersonProfile({ person }: { person: Person }) {
           <div className="min-h-[400px]">
             {activeTab === 'all' && (
               <div className="">
-                <div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {allContent.map((item: any) => (
-                      <PinterestCard
-                        key={item.id}
-                        id={item.slug}
-                        title={item.title}
-                        subtitle={item.categories?.nodes?.[0]?.name}
-                        description={item.excerpt ? item.excerpt.replace(/<[^>]+>/g, '') : undefined}
-                        image={item.featuredImage?.node?.sourceUrl || "/placeholder.svg?height=300&width=250"}
-                        height="300px"
-                        // You can add more props as needed
-                      />
-                    ))}
+                {allContent.length > 0 ? (
+                  <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {allContent.map((item: any) => (
+                        <PinterestCard
+                          key={item.id}
+                          id={item.slug}
+                          title={item.title}
+                          subtitle={item.categories?.nodes?.[0]?.name}
+                          description={item.excerpt ? item.excerpt.replace(/<[^>]+>/g, '') : undefined}
+                          image={item.featuredImage?.node?.sourceUrl || "/placeholder.svg?height=300&width=250"}
+                          height="300px"
+                          // You can add more props as needed
+                        />
+                      ))}
+                    </div>
+                    <div className="flex justify-center mt-8">
+                      <button
+                        onClick={() => setLimit4((prev) => prev + 6)}
+                        className="px-6 py-2 border-black  text-blue-400 text-4xl transition hover:text-blue-500"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
-                </div>
-    {team.length > 0 && (
-      <div className="flex justify-center mt-8">
-        <button
-          onClick={() => setLimit4((prev) => prev + 6)}
-          className="px-6 py-2 border-black  text-blue-400 text-4xl transition hover:text-blue-500"
-        >
-          +
-        </button>
-      </div>
-    )}
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8">
+                      <div className="text-gray-500 text-lg font-medium mb-2">Under Development</div>
+                      <p className="text-gray-400 text-sm">This section is currently being developed and will be available soon.</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -418,7 +564,10 @@ export default function PersonProfile({ person }: { person: Person }) {
     </div>
     {deals.length === 0 && (
       <div className="text-center py-12">
-        <p className="text-gray-500">No deals available at the moment.</p>
+        <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8">
+          <div className="text-gray-500 text-lg font-medium mb-2">Under Development</div>
+          <p className="text-gray-400 text-sm">This section is currently being developed and will be available soon.</p>
+        </div>
       </div>
     )}
     {deals.length > 0 && (
@@ -455,7 +604,10 @@ export default function PersonProfile({ person }: { person: Person }) {
     </div>
     {team.length === 0 && (
       <div className="text-center py-12">
-        <p className="text-gray-500">No team members found.</p>
+        <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8">
+          <div className="text-gray-500 text-lg font-medium mb-2">Under Development</div>
+          <p className="text-gray-400 text-sm">This section is currently being developed and will be available soon.</p>
+        </div>
       </div>
     )}
     {team.length > 0 && (
@@ -490,13 +642,16 @@ export default function PersonProfile({ person }: { person: Person }) {
     </div>
     {jobs.length === 0 && (
       <div className="text-center py-12">
-        <p className="text-gray-500 mb-4">No job opportunities available at the moment.</p>
-        <a
-          href="/Career?category=Jobs"
-          className="inline-flex items-center px-4 py-2 bg-[#0a72bd]-600 text-white text-sm font-medium rounded-lg hover:bg-[#0a72bd]-700 transition-colors"
-        >
-          Browse All Jobs
-        </a>
+        <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8">
+          <div className="text-gray-500 text-lg font-medium mb-2">Under Development</div>
+          <p className="text-gray-400 text-sm mb-4">This section is currently being developed and will be available soon.</p>
+          <a
+            href="/Career?category=Jobs"
+            className="inline-flex items-center px-4 py-2 bg-[#0a72bd] text-white text-sm font-medium rounded-lg hover:bg-[#085a96] transition-colors"
+          >
+            Browse All Jobs
+          </a>
+        </div>
       </div>
     )}
     {jobs.length > 0 && (
@@ -515,6 +670,8 @@ export default function PersonProfile({ person }: { person: Person }) {
           </div>
         </div>
       </section>
+      {/* Footer - Only visible when reaching the end */}
+      {showFooter && <Footer />}
     </main>
   );
 }
