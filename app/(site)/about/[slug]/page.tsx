@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import BeliefCard from "@/components/cards/BeliefCard";
@@ -6,68 +8,70 @@ import BeliefCarousel from "@/components/cards/BeliefCarousel";
 import ScrollToTopButton from "@/components/ui/ScrollToTopButton";
 import ScrollIcon from "@/components/ui/ScrollIcon";
 import PageFooter from "@/components/layout/PageFooter";
-import { wpFetch } from "@/lib/api/fetcher";
-
-export const revalidate = 60;
-
-const DETAIL_QUERY = `
-  query Belief($slug:ID!) {
-    belief(id:$slug, idType:SLUG) {
-      title
-      slug
-      beliefFields { teaserPrefix teaserTitle heroTitle introLeft introRight }
-      featuredImage { node { sourceUrl altText } }
-    }
-  }
-`;
-
-const MORE_QUERY = `
-  query MoreBeliefs($first:Int!) {
-    beliefs(first:$first, where:{orderby:{field: DATE, order: DESC}}) {
-      nodes {
-        slug
-        title
-        beliefFields { teaserPrefix teaserTitle }
-        featuredImage { node { sourceUrl altText } }
-      }
-    }
-  }
-`;
+import Footer from '@/components/layout/Footer';
 
 function stripHtml(s?: string | null) {
   return (s || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
 
-export async function generateMetadata(
-  { params }: { params: Promise<{ slug: string }> }
-): Promise<Metadata> {
-  const { slug } = await params;
-  const { data } = await wpFetch(DETAIL_QUERY, { slug });
-  const b = data?.belief;
-  if (!b) return { title: "Belief not found" };
+export default function BeliefPage({ params }: { params: Promise<{ slug: string }> }) {
+  const [belief, setBelief] = useState<any>(null);
+  const [more, setMore] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [slug, setSlug] = useState<string>('');
 
-  const title =
-    b.beliefFields?.heroTitle ||
-    `${b.beliefFields?.teaserPrefix ?? "We believe in"} ${b.beliefFields?.teaserTitle ?? b.title}`;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resolvedParams = await params;
+        setSlug(resolvedParams.slug);
+        
+        const [beliefResponse, moreResponse] = await Promise.all([
+          fetch(`/api/beliefs/${resolvedParams.slug}`),
+          fetch('/api/beliefs?limit=8')
+        ]);
+        
+        if (!beliefResponse.ok) {
+          throw new Error('Belief not found');
+        }
+        
+        const beliefData = await beliefResponse.json();
+        const moreData = await moreResponse.json();
+        
+        if (!beliefData) {
+          notFound();
+          return;
+        }
+        
+        setBelief(beliefData);
+        const filteredMore = (moreData?.nodes || [])
+          .filter((n: any) => n.slug !== resolvedParams.slug);
+        setMore(filteredMore);
+      } catch (error) {
+        console.error('Error fetching belief data:', error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const img = b.featuredImage?.node?.sourceUrl as string | undefined;
+    fetchData();
+  }, [params]);
 
-  return {
-    title,
-    description: stripHtml(b.beliefFields?.introLeft) || undefined,
-    openGraph: { title, images: img ? [{ url: img }] : undefined },
-    twitter: { card: "summary_large_image", title, images: img ? [img] : undefined },
-  };
-}
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading belief details...</p>
+        </div>
+      </main>
+    );
+  }
 
-export default async function BeliefPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const { data } = await wpFetch(DETAIL_QUERY, { slug });
-  const belief = data?.belief;
-  if (!belief) return notFound();
-
-  const moreData = await wpFetch(MORE_QUERY, { first: 8 });
-  const more = (moreData?.data?.beliefs?.nodes ?? []).filter((n: any) => n.slug !== slug);
+  if (!belief) {
+    return notFound();
+  }
 
   const heroTitle = belief.beliefFields?.heroTitle || belief.beliefFields?.teaserTitle || belief.title;
 
@@ -75,6 +79,27 @@ export default async function BeliefPage({ params }: { params: Promise<{ slug: s
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative h-[100vh] md:h-[100vh] bg-gradient-to-br from-amber-50 to-orange-100 overflow-hidden">
+        {/* X Close Button */}
+        <button
+          onClick={() => window.history.back()}
+          className="absolute top-6 right-6 z-50 bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-xl transition-all duration-300 hover:scale-110 shadow-lg"
+          aria-label="Close"
+        >
+          <svg 
+            className="w-6 h-6" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M6 18L18 6M6 6l12 12" 
+            />
+          </svg>
+        </button>
+
         {belief.featuredImage?.node?.sourceUrl && (
           <div className="absolute inset-0">
             <img

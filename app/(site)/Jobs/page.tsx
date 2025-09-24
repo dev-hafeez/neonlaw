@@ -17,7 +17,7 @@ import ExitTransition from "@/components/layout/HeroSectionExit";
 const TILE_W = 220;
 const TILE_H = 220;
 const GAP_X = 25;
-const GAP_Y = 2;
+const GAP_Y = 25;
 
 const COLUMN_WIDTH = TILE_W;
 const STRIDE_X = COLUMN_WIDTH + GAP_X;
